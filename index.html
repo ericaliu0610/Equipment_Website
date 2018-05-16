@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<style>
+	div.tooltipFilter{
+		position: fixed;
+		width: 600px;
+		height:400px;
+		padding: 2px;
+		font: 26px sans-serif;
+		background: #b3cde3;
+		border: 2px;
+		border-radius: 5px;
+		pointer-events: none;
+		text-align: left;
+	}
+</style>
+<title>Equipment Dashboard</title>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<link rel="shortcut icon" href="">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<body class="w3-content" style="max-width:1200px">
+
+<!-- <div class="w3-panel">
+  <i class="w3-xlarge fa fa-bars"></i>
+</div> -->
+<!-- First Grid: Logo & About -->
+<div class="w3-row">
+<div class="w3-half w3-container">
+<h1 class="w3-xxlarge w3-text-light-grey">Hello</h1>
+  <h1 class="w3-xxlarge w3-text-light-grey">I am an^^</h1>
+  <h1 class="w3-xxlarge">Expected Replacement Date Dashboard</h1>
+</div>
+<div class="w3-half w3-container w3-xlarge w3-text-grey">
+  <p class="">This dashboard is designed for visualizing the FAKE analysis results
+  for predicting the replacement date of medical equipments at UMASS Medical.</p>
+  <p>One thousand data entries are generated with the following attributes: order_id, name, 
+  company info, current status, expected date to replace, etc.</p>
+</div>
+</div>
+
+<!-- Second Grid: Resent -->
+<div class="w3-panel w3-xlarge">
+  <p>Please input a valid equipment ID number (range from 1 to 1000):</p>
+<input type="number" id="inputID" value="1" min="1" max="1000"><button onclick="myFunction()">Submit</button>
+</div>
+<script>
+function myFunction(){
+    var inputID = document.getElementById("inputID").value;
+	console.log(inputID)
+	d3.csv("generate_fake_data/fake_data.csv", function(data) {
+		for (var i = 0; i < data.length; i++) {
+			if(i==inputID - 1){
+			var dataUse = data[i];
+			var dataTest = [Math.round(parseFloat(dataUse.status)*100), Math.round(100 - parseFloat(dataUse.status)*100)]
+			console.log(dataTest);
+			d3.select("svg").remove()
+			var r = 200;
+			var color = d3.scale.ordinal()
+						.range(["#ccebc5", "#fbb4ae"])
+			var canvas = d3.select("body")
+					.append("svg")
+					.attr("width", 1272)
+					.attr("height", 600);
+			1
+			var group = canvas.append("g")
+						.attr("transform", "translate(300, 300)");
+			
+			var arc = d3.svg.arc()
+						.innerRadius(100)
+						.outerRadius(r)
+						
+			var pie = d3.layout.pie()
+						.value(function(d){return d;});
+			
+			var arcs =  group.selectAll(".arc")
+						.data(pie(dataTest))
+						.enter()
+						.append("g")
+						.attr("class", "arc");
+						
+			arcs.append("path")
+				.attr("d", arc)
+				.attr("fill", function(d){return color(d.data);});
+				
+			arcs.append("text")
+				.attr("transform", function(d){return "translate(" + arc.centroid(d) + ")";})
+				.attr("text-anchor", "middle")
+				.attr("font-size", "1.5em")
+				.text(function(d){return d.data;});
+			
+			var textStatus = hehe(dataTest);
+			function hehe(dataTest){
+					if (parseFloat(dataTest[0]) >= 75){
+						return "Good Condition";}
+					else if (parseFloat(dataTest[0]) >= 30 && parseFloat(dataTest[0]) < 75){
+						return "Moderate Condition";}
+					else{
+						return "Replace Needed";}
+				}
+			arcs.append("text")
+				.attr("text-anchor", "middle")
+				.attr("font-size", "1.2em")
+				.text(textStatus);
+				
+			d3.select("#key_line").remove()
+			var divFilter = d3.select("body")
+            .append("div")
+            .attr("class", "tooltipFilter")
+			.attr("id","key_line")
+            .style("opacity", 0.8);
+			divFilter.html("Equipment Name: " + dataUse.name + "<br/><br>" 
+							+ "Expected Replacement Date: " + dataUse.exp_date + "<br/>" 
+							+ "Pruduction Date: " + dataUse.stock_date + "<br/>" 
+							+ "Current Quality Score: " + dataUse.status + "<br/>" 
+							+ "In-stock Quantity: " + dataUse.quantity + "<br><br/>" 
+							+ "Contact Info to Reorder the Equipment" + "<br/>"
+							+ "&nbsp&nbsp&nbsp-Company: " + dataUse.company + "<br/>" 
+							+ "&nbsp&nbsp&nbsp-Address: " + dataUse.address + "<br/>" 
+							+ "&nbsp&nbsp&nbsp-Tel: " + dataUse.tel + "<br/>" 
+							+ "&nbsp&nbsp&nbsp-E-mail: " + dataUse.email
+							)
+					.style("left", "900px")
+                    .style("top", "650px");
+			}
+		}
+	});	
+}
+</script>
+<!-- Footer -->
+<div class="w3-container w3-text-grey">
+  <p>Created by Wen Liu, wliu3@wpi.edu</p>
+</div>
+</body>
+</html>
